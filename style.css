@@ -188,6 +188,18 @@ body {
   margin-bottom: 0.5rem;
 }
 
+/* ---------- pemutar YouTube (tak terlihat, tetap ukuran 200x200 agar boleh diputar) ---------- */
+.yt {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
 /* ---------- tombol musik ---------- */
 .music {
   position: fixed;

@@ -7,9 +7,9 @@ const CONFIG = {
     'Pantesan hariku langsung terasa lebih baik sejak kenal kamu.',
     'Maaf ya, gombalannya receh 😄',
   ],
-  music: 'lagu.mp3', // taruh file lagu di folder ini; kosongkan ('') kalau tidak pakai lagu
-  musicStart: 0,     // mulai dari detik ke berapa (misal 45 untuk langsung ke reff)
-  volume: 0.6,       // 0 sampai 1
+  youtubeId: 'nyuo9-OjNNg', // ID video YouTube (bagian setelah v= di link); '' kalau tidak pakai lagu
+  musicStart: 0,            // mulai dari detik ke berapa (misal 45 untuk langsung ke reff)
+  volume: 60,               // 0 sampai 100
   question: 'Boleh kenalan lebih jauh?',
   yesText: 'Boleh 😊',
   noTexts: [
@@ -42,11 +42,10 @@ const result = $('result');
 
 const cover = $('cover');
 const openBtn = $('open');
-const audio = $('bgm');
 const music = $('music');
 
 $('coverText').textContent = `Ada pesan buat ${CONFIG.name}`;
-$('coverHint').textContent = CONFIG.music ? 'Nyalakan suaranya ya 🔊' : '';
+$('coverHint').textContent = CONFIG.youtubeId ? 'Nyalakan suaranya ya 🔊' : '';
 greeting.textContent = `Hai, ${CONFIG.name} 💌`;
 question.textContent = CONFIG.question;
 yes.textContent = CONFIG.yesText;
@@ -245,30 +244,60 @@ function floatHearts() {
   }
 }
 
-// ---------- lagu ----------
-// Browser memblokir suara otomatis, jadi lagu baru diputar setelah tombol "Buka" diklik.
-function startMusic() {
-  if (!CONFIG.music) return;
-  audio.src = CONFIG.music;
-  audio.volume = CONFIG.volume;
-  if (CONFIG.musicStart > 0) audio.currentTime = CONFIG.musicStart;
-  audio.play().then(() => { music.hidden = false; }).catch(() => {}); // file tidak ada: diam saja
+// ---------- lagu (pemutar YouTube tersembunyi) ----------
+// Pemutar dimuat sejak halaman dibuka, lalu diputar saat tombol "Buka" diklik,
+// karena browser hanya mengizinkan suara setelah ada klik dari pengunjung.
+let player = null;
+let playerReady = false;
+let opened = false;
+
+function loadYouTube() {
+  if (!CONFIG.youtubeId) return;
+
+  window.onYouTubeIframeAPIReady = () => {
+    player = new YT.Player('ytPlayer', {
+      width: 200,
+      height: 200,
+      videoId: CONFIG.youtubeId,
+      playerVars: { controls: 0, playsinline: 1, rel: 0, start: CONFIG.musicStart },
+      events: {
+        onReady: () => {
+          playerReady = true;
+          player.setVolume(CONFIG.volume);
+          music.hidden = false;
+          if (opened) player.playVideo();
+        },
+        onStateChange: (e) => {
+          // ulang dari musicStart, bukan dari detik 0
+          if (e.data === YT.PlayerState.ENDED) {
+            player.seekTo(CONFIG.musicStart, true);
+            player.playVideo();
+          }
+          const playing = e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING;
+          music.textContent = playing ? '🔊' : '🔇';
+        },
+      },
+    });
+  };
+
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
 }
 
-// loop manual supaya kembali ke musicStart, bukan ke detik 0
-audio.addEventListener('ended', () => {
-  audio.currentTime = CONFIG.musicStart;
-  audio.play();
+music.addEventListener('click', () => {
+  if (!playerReady) return;
+  if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
+  else player.playVideo();
 });
-audio.addEventListener('play', () => { music.textContent = '🔊'; });
-audio.addEventListener('pause', () => { music.textContent = '🔇'; });
-music.addEventListener('click', () => (audio.paused ? audio.play() : audio.pause()));
 
 // ---------- mulai ----------
 openBtn.addEventListener('click', () => {
+  opened = true;
   cover.classList.add('hide');
-  startMusic();
+  if (playerReady) player.playVideo();
   intro();
 }, { once: true });
 
+loadYouTube();
 floatHearts();
