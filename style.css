@@ -1,0 +1,217 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+  font-family: 'Quicksand', system-ui, sans-serif;
+  color: #5b2a3c;
+  background: linear-gradient(135deg, #ffe3ec 0%, #f3e5ff 100%);
+}
+
+/* ---------- background hearts ---------- */
+.hearts {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heart {
+  position: absolute;
+  bottom: -48px;
+  opacity: 0;
+  animation: rise linear infinite;
+}
+
+@keyframes rise {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.55; }
+  100% { transform: translateY(-115vh) rotate(25deg); opacity: 0; }
+}
+
+#confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* ---------- card ---------- */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(190, 80, 120, 0.2);
+}
+
+.greeting {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  color: #d6336c;
+  margin-bottom: 1rem;
+}
+
+.message,
+.result {
+  white-space: pre-line;
+  line-height: 1.7;
+  font-size: clamp(1rem, 4vw, 1.1rem);
+}
+
+.rest {
+  visibility: hidden;
+}
+
+.question {
+  margin-top: 1.5rem;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  color: #d6336c;
+}
+
+.reveal {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s;
+}
+
+.reveal.show {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* ---------- buttons ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.25rem;
+  min-height: 3.5rem;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.yes {
+  color: #fff;
+  background: linear-gradient(135deg, #ff5e8a, #d6336c);
+  box-shadow: 0 8px 20px rgba(214, 51, 108, 0.35);
+  transition: transform 0.3s ease;
+}
+
+.no {
+  color: #6b4b59;
+  background: #eadfe4;
+}
+
+.no.floating {
+  position: fixed;
+  z-index: 10;
+  transition: left 0.3s ease, top 0.3s ease;
+}
+
+.result {
+  margin-top: 0.5rem;
+}
+
+/* ---------- layar pembuka ---------- */
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, #ffe3ec 0%, #f3e5ff 100%);
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+
+.cover.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.envelope {
+  font-size: 5rem;
+  animation: bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  50% { transform: translateY(-12px); }
+}
+
+.cover-text {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  color: #d6336c;
+}
+
+.cover-hint {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- tombol musik ---------- */
+.music {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 15;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 12px rgba(190, 80, 120, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .envelope {
+    animation: none;
+  }
+
+  .reveal,
+  .yes,
+  .no.floating {
+    transition: none;
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untuk Syifa 💌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <audio id="bgm" preload="auto"></audio>
+  <button class="music" id="music" type="button" aria-label="Putar atau jeda lagu" hidden>🔊</button>
+
+  <div class="cover" id="cover">
+    <div class="envelope" aria-hidden="true">💌</div>
+    <p class="cover-text" id="coverText"></p>
+    <p class="cover-hint" id="coverHint"></p>
+    <button class="btn yes" id="open" type="button">Buka 💌</button>
+  </div>
+
+  <main class="card">
+    <p class="greeting" id="greeting"></p>
+    <p class="message" id="message"></p>
+
+    <h1 class="question reveal" id="question"></h1>
+    <div class="actions reveal" id="actions">
+      <button class="btn yes" id="yes" type="button"></button>
+      <button class="btn no" id="no" type="button"></button>
+    </div>
+
+    <p class="result" id="result" aria-live="polite"></p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
