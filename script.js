@@ -1,248 +1,113 @@
-// ====== Edit bagian ini saja untuk mengganti isi ucapan ======
+// ====== Edit bagian ini saja untuk mengganti isi pesan ======
 const CONFIG = {
-  name: 'Syifa',
-  message: [
-    'Kita emang baru kenal.',
-    'Katanya nama Syifa artinya penyembuh.',
-    'Pantesan hariku langsung terasa lebih baik sejak kenal kamu.',
-    'Maaf ya, gombalannya receh 😄',
+  name: 'Nama Dia', // dipakai di layar pembuka
+
+  // Tiap item tampil satu per satu seperti bubble chat.
+  messages: [
+    'this is my last message to you.',
+    'i think i\'m finally accepting that whatever was starting between us isn\'t going to happen.',
+    'i hope my distance brings you peace. i can tell something changed, and i don\'t want to be someone you have to avoid, so i\'m stepping back now.',
+    'thank you for everything. for the short time we had, and for reminding me how it feels to really look forward to someone.',
+    'i want you to know that i tried. i was honest about how i felt, and i would have kept showing up if you\'d let me. but sometimes things just don\'t turn out the way we hope.',
+    'we only met three times. at the concert, the day we ran into each other while cycling, and our one date.',
+    'it wasn\'t much, but it meant more to me than i expected. something changed after that date, and i still don\'t know why. maybe i never will.',
+    'my chapter with you ends here, but i still wish you nothing but the best. if i said or did anything that hurt you or made you uncomfortable, i\'m sorry.',
+    'i hope you find what you\'re looking for. i hope you\'ll be happy.',
+    'i think a part of me will still wonder what could have been. you were only in my life for a little while, but you left a mark.',
+    'but it\'s time for me to let you go. i\'ll miss talking to you. i guess this is me trying to move on.',
+    'not hearing from you hurts more than i thought it would. but that\'s how i know what i felt was real.',
   ],
-  youtubeId: 'nyuo9-OjNNg', // ID video YouTube (bagian setelah v= di link); '' kalau tidak pakai lagu
-  musicStart: 0,            // mulai dari detik ke berapa (misal 45 untuk langsung ke reff)
-  volume: 60,               // 0 sampai 100
-  question: 'Boleh kenalan lebih jauh?',
-  yesText: 'Boleh 😊',
-  noTexts: [
-    'Nggak',
-    'Yakin?',
-    'Baru kenal udah ditolak 🥺',
-    'Sekali aja deh',
-    'Aku traktir es krim',
-    'Please 🥺',
-    'Klik yang satunya aja 👉',
-  ],
-  result: [
-    'Yeay, makasih ya Syifa! 😊',
-    'Semoga ngobrolnya lebih seru dari gombalan tadi.',
-    'Salam kenal ya!',
-  ],
+
+  closing: 'even though you won\'t be in my life anymore, i\'m glad our paths crossed, even if only for a little while.', // tampil setelah bubble terakhir
+
+  youtubeId: 'XZfyyk0_Yqs', // ID video YouTube (bagian setelah v= di link); '' kalau tidak pakai lagu
+  musicStart: 0,            // mulai dari detik ke berapa
+  volume: 50,               // 0 sampai 100
 };
 // =============================================================
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const greeting = $('greeting');
-const message = $('message');
-const question = $('question');
-const actions = $('actions');
-const yes = $('yes');
-const no = $('no');
-const result = $('result');
-
 const cover = $('cover');
 const openBtn = $('open');
+const stage = $('stage');
+const bubble = $('bubble');
+const counter = $('counter');
+const progress = $('progress');
+const prevBtn = $('prev');
+const nextBtn = $('next');
+const tapLeft = $('tapLeft');
+const tapRight = $('tapRight');
+const signature = $('signature');
 const music = $('music');
 
 $('coverText').textContent = `Ada pesan buat ${CONFIG.name}`;
 $('coverHint').textContent = CONFIG.youtubeId ? 'Nyalakan suaranya ya 🔊' : '';
-greeting.textContent = `Hai, ${CONFIG.name} 💌`;
-question.textContent = CONFIG.question;
-yes.textContent = CONFIG.yesText;
-no.textContent = CONFIG.noTexts[0];
 
-// ---------- typewriter ----------
-// Teks yang belum diketik tetap disimpan (tak terlihat) supaya tinggi kartu tidak loncat.
-function typeText(el, text, speed = 45) {
-  return new Promise((resolve) => {
-    const chars = Array.from(text);
-    const typed = document.createElement('span');
-    const rest = document.createElement('span');
-    rest.className = 'rest';
-    el.replaceChildren(typed, rest);
-
-    if (reduceMotion) {
-      typed.textContent = text;
-      return resolve();
-    }
-
-    let i = 0;
-    const tick = () => {
-      i++;
-      typed.textContent = chars.slice(0, i).join('');
-      rest.textContent = chars.slice(i).join('');
-      if (i >= chars.length) return resolve();
-      const pause = /[.,?!\n]/.test(chars[i - 1]) ? speed * 6 : speed;
-      setTimeout(tick, pause);
-    };
-    rest.textContent = text;
-    tick();
-  });
-}
-
-async function intro() {
-  await typeText(message, CONFIG.message.join('\n'));
-  question.classList.add('show');
-  actions.classList.add('show');
-}
-
-// ---------- tombol "Nggak" yang kabur ----------
-let dodges = 0;
-let lastDodge = 0;
-
-function dodge(event) {
-  if (event && event.type === 'click') event.preventDefault();
-
-  const now = Date.now();
-  if (now - lastDodge < 200) return; // pointerdown + focus + click bisa datang beruntun
-  lastDodge = now;
-
-  const start = no.getBoundingClientRect();
-  if (!no.classList.contains('floating')) {
-    // pindah ke <body>: backdrop-filter pada kartu membuat position:fixed relatif ke kartu, bukan layar
-    document.body.appendChild(no);
-    no.style.left = `${start.left}px`;
-    no.style.top = `${start.top}px`;
-    no.classList.add('floating');
-    void no.offsetWidth; // paksa reflow supaya lompatan pertama teranimasi
-  }
-
-  dodges++;
-  no.textContent = CONFIG.noTexts[Math.min(dodges, CONFIG.noTexts.length - 1)];
-
-  const pad = 12;
-  const nw = no.offsetWidth;
-  const nh = no.offsetHeight;
-  const maxX = Math.max(pad, window.innerWidth - nw - pad);
-  const maxY = Math.max(pad, window.innerHeight - nh - pad);
-  const yesRect = yes.getBoundingClientRect();
-
-  let x = pad;
-  let y = pad;
-  for (let i = 0; i < 25; i++) {
-    x = pad + Math.random() * (maxX - pad);
-    y = pad + Math.random() * (maxY - pad);
-    const overlapsYes =
-      x < yesRect.right + 16 && x + nw > yesRect.left - 16 &&
-      y < yesRect.bottom + 16 && y + nh > yesRect.top - 16;
-    const farEnough = Math.hypot(x - start.left, y - start.top) > 120;
-    if (!overlapsYes && farEnough) break;
-  }
-  no.style.left = `${x}px`;
-  no.style.top = `${y}px`;
-
-  // tombol "Iya" makin besar tiap "Nggak" kabur
-  yes.style.transform = `scale(${Math.min(1 + dodges * 0.08, 1.6)})`;
-}
-
-['pointerenter', 'pointerdown', 'focus', 'click'].forEach((type) => no.addEventListener(type, dodge));
-
-window.addEventListener('resize', () => {
-  if (no.classList.contains('floating')) {
-    lastDodge = 0;
-    dodge();
-  }
+// ---------- progress dots ----------
+CONFIG.messages.forEach(() => {
+  const dot = document.createElement('span');
+  progress.appendChild(dot);
 });
 
-// ---------- tombol "Iya" ----------
-yes.addEventListener('click', async () => {
-  const rect = yes.getBoundingClientRect();
-  question.remove();
-  actions.remove();
-  no.remove();
+let index = 0;
 
-  burst(rect.left + rect.width / 2, rect.top + rect.height / 2);
-  [350, 800, 1300].forEach((delay) =>
-    setTimeout(() => burst(Math.random() * window.innerWidth, window.innerHeight * (0.3 + Math.random() * 0.3)), delay)
-  );
+function render() {
+  const total = CONFIG.messages.length;
+  counter.textContent = `${index + 1}/${total}`;
+  prevBtn.disabled = index === 0;
+  nextBtn.disabled = false;
 
-  await typeText(result, CONFIG.result.join('\n'), 55);
+  [...progress.children].forEach((dot, i) => dot.classList.toggle('done', i <= index));
+
+  bubble.classList.remove('show');
+  // reflow supaya transisi masuk terulang tiap ganti pesan
+  void bubble.offsetWidth;
+  bubble.textContent = CONFIG.messages[index];
+  requestAnimationFrame(() => bubble.classList.add('show'));
+}
+
+function go(delta) {
+  const total = CONFIG.messages.length;
+  const nextIndex = index + delta;
+
+  if (nextIndex >= total) {
+    finish();
+    return;
+  }
+  if (nextIndex < 0) return;
+
+  index = nextIndex;
+  render();
+}
+
+function finish() {
+  stage.hidden = true;
+  signature.textContent = CONFIG.closing;
+  signature.classList.add('show');
+}
+
+prevBtn.addEventListener('click', () => go(-1));
+nextBtn.addEventListener('click', () => go(1));
+tapLeft.addEventListener('click', () => go(-1));
+tapRight.addEventListener('click', () => go(1));
+
+document.addEventListener('keydown', (e) => {
+  if (stage.hidden) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') go(1);
+  if (e.key === 'ArrowLeft') go(-1);
 });
 
-// ---------- confetti hati ----------
-const canvas = $('confetti');
-const ctx = canvas.getContext('2d');
-const SYMBOLS = ['💗', '💖', '💕', '✨', '🌸'];
-let particles = [];
-let running = false;
-
-function resizeCanvas() {
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-function burst(x, y) {
-  if (reduceMotion) return;
-  for (let i = 0; i < 60; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 4 + Math.random() * 10;
-    particles.push({
-      x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 4,
-      size: 16 + Math.random() * 16,
-      rot: Math.random() * Math.PI,
-      vr: (Math.random() - 0.5) * 0.2,
-      life: 1,
-      symbol: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-    });
-  }
-  if (!running) {
-    running = true;
-    requestAnimationFrame(animate);
-  }
-}
-
-function animate() {
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  particles = particles.filter((p) => p.life > 0 && p.y < window.innerHeight + 40);
-
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (const p of particles) {
-    p.vy += 0.25;
-    p.vx *= 0.99;
-    p.x += p.vx;
-    p.y += p.vy;
-    p.rot += p.vr;
-    p.life -= 0.006;
-
-    ctx.save();
-    ctx.globalAlpha = Math.max(p.life, 0);
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot);
-    ctx.font = `${p.size}px serif`;
-    ctx.fillText(p.symbol, 0, 0);
-    ctx.restore();
-  }
-
-  if (particles.length) {
-    requestAnimationFrame(animate);
-  } else {
-    running = false;
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  }
-}
-
-// ---------- hati melayang di latar ----------
-function floatHearts() {
-  if (reduceMotion) return;
-  const container = $('hearts');
-  for (let i = 0; i < 18; i++) {
-    const heart = document.createElement('span');
-    heart.className = 'heart';
-    heart.textContent = i % 3 === 0 ? '💕' : '💗';
-    heart.style.left = `${Math.random() * 100}%`;
-    heart.style.fontSize = `${14 + Math.random() * 22}px`;
-    heart.style.animationDuration = `${8 + Math.random() * 8}s`;
-    heart.style.animationDelay = `${Math.random() * 10}s`;
-    container.appendChild(heart);
-  }
-}
+// swipe kiri/kanan untuk HP
+let touchX = null;
+stage.addEventListener('touchstart', (e) => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+stage.addEventListener('touchend', (e) => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+  touchX = null;
+}, { passive: true });
 
 // ---------- lagu (pemutar YouTube tersembunyi) ----------
 // Pemutar dimuat sejak halaman dibuka, lalu diputar saat tombol "Buka" diklik,
@@ -265,7 +130,11 @@ function loadYouTube() {
           playerReady = true;
           player.setVolume(CONFIG.volume);
           music.hidden = false;
-          if (opened) player.playVideo();
+          // mulai diam-diam (muted selalu diizinkan browser tanpa klik),
+          // baru di-unmute begitu ada klik dari pengunjung
+          player.mute();
+          player.playVideo();
+          if (opened) unmuteMusic();
         },
         onStateChange: (e) => {
           // ulang dari musicStart, bukan dari detik 0
@@ -273,8 +142,11 @@ function loadYouTube() {
             player.seekTo(CONFIG.musicStart, true);
             player.playVideo();
           }
-          const playing = e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING;
+          const playing = (e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING) && !player.isMuted();
           music.textContent = playing ? '🔊' : '🔇';
+        },
+        onError: (e) => {
+          console.warn('YouTube player error', e.data);
         },
       },
     });
@@ -285,19 +157,26 @@ function loadYouTube() {
   document.head.appendChild(tag);
 }
 
+function unmuteMusic() {
+  if (!playerReady) return;
+  player.unMute();
+  player.playVideo();
+  music.textContent = '🔊';
+}
+
 music.addEventListener('click', () => {
   if (!playerReady) return;
-  if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
-  else player.playVideo();
+  if (player.getPlayerState() === YT.PlayerState.PLAYING && !player.isMuted()) player.pauseVideo();
+  else unmuteMusic();
 });
 
 // ---------- mulai ----------
 openBtn.addEventListener('click', () => {
   opened = true;
   cover.classList.add('hide');
-  if (playerReady) player.playVideo();
-  intro();
+  stage.hidden = false;
+  unmuteMusic();
+  render();
 }, { once: true });
 
 loadYouTube();
-floatHearts();

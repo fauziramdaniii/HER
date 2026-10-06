@@ -3,38 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Untuk Syifa 💌</title>
+  <title>Untuk Kamu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="hearts" id="hearts" aria-hidden="true"></div>
-  <canvas id="confetti" aria-hidden="true"></canvas>
-
   <div class="yt" aria-hidden="true"><div id="ytPlayer"></div></div>
   <button class="music" id="music" type="button" aria-label="Putar atau jeda lagu" hidden>🔊</button>
 
   <div class="cover" id="cover">
-    <div class="envelope" aria-hidden="true">💌</div>
-    <p class="cover-text" id="coverText"></p>
+    <p class="cover-icon" aria-hidden="true">✉️</p>
+    <p class="cover-text" id="coverText">Ada pesan buat kamu</p>
     <p class="cover-hint" id="coverHint"></p>
-    <button class="btn yes" id="open" type="button">Buka 💌</button>
+    <button class="btn open" id="open" type="button">Buka</button>
   </div>
 
-  <main class="card">
-    <p class="greeting" id="greeting"></p>
-    <p class="message" id="message"></p>
+  <main class="stage" id="stage" hidden>
+    <div class="progress" id="progress" aria-hidden="true"></div>
+    <p class="counter" id="counter"></p>
 
-    <h1 class="question reveal" id="question"></h1>
-    <div class="actions reveal" id="actions">
-      <button class="btn yes" id="yes" type="button"></button>
-      <button class="btn no" id="no" type="button"></button>
+    <div class="bubble-area">
+      <div class="bubble" id="bubble"></div>
     </div>
 
-    <p class="result" id="result" aria-live="polite"></p>
+    <div class="nav">
+      <button class="nav-btn prev" id="prev" type="button" aria-label="Sebelumnya">‹</button>
+      <button class="nav-btn next" id="next" type="button" aria-label="Berikutnya">›</button>
+    </div>
+
+    <div class="tap-zones" aria-hidden="true">
+      <div class="tap-zone tap-left" id="tapLeft"></div>
+      <div class="tap-zone tap-right" id="tapRight"></div>
+    </div>
   </main>
+
+  <footer class="signature reveal" id="signature"></footer>
 
   <script src="script.js"></script>
 </body>
