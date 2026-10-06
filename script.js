@@ -1,7 +1,5 @@
 // ====== Edit bagian ini saja untuk mengganti isi pesan ======
 const CONFIG = {
-  name: 'Nama Dia', // dipakai di layar pembuka
-
   // Tiap item tampil satu per satu seperti bubble chat.
   messages: [
     'this is my last message to you.',
@@ -29,8 +27,6 @@ const CONFIG = {
 const $ = (id) => document.getElementById(id);
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const cover = $('cover');
-const openBtn = $('open');
 const stage = $('stage');
 const bubble = $('bubble');
 const counter = $('counter');
@@ -41,9 +37,6 @@ const tapLeft = $('tapLeft');
 const tapRight = $('tapRight');
 const signature = $('signature');
 const music = $('music');
-
-$('coverText').textContent = `Ada pesan buat ${CONFIG.name}`;
-$('coverHint').textContent = CONFIG.youtubeId ? 'Nyalakan suaranya ya 🔊' : '';
 
 // ---------- progress dots ----------
 CONFIG.messages.forEach(() => {
@@ -110,11 +103,11 @@ stage.addEventListener('touchend', (e) => {
 }, { passive: true });
 
 // ---------- lagu (pemutar YouTube tersembunyi) ----------
-// Pemutar dimuat sejak halaman dibuka, lalu diputar saat tombol "Buka" diklik,
-// karena browser hanya mengizinkan suara setelah ada klik dari pengunjung.
+// Pemutar dimuat sejak halaman dibuka. Suara baru dinyalakan begitu ada
+// klik/tap pertama dari pengunjung, karena browser memblokir suara otomatis.
 let player = null;
 let playerReady = false;
-let opened = false;
+let interacted = false;
 
 function loadYouTube() {
   if (!CONFIG.youtubeId) return;
@@ -134,7 +127,7 @@ function loadYouTube() {
           // baru di-unmute begitu ada klik dari pengunjung
           player.mute();
           player.playVideo();
-          if (opened) unmuteMusic();
+          if (interacted) unmuteMusic();
         },
         onStateChange: (e) => {
           // ulang dari musicStart, bukan dari detik 0
@@ -171,12 +164,14 @@ music.addEventListener('click', () => {
 });
 
 // ---------- mulai ----------
-openBtn.addEventListener('click', () => {
-  opened = true;
-  cover.classList.add('hide');
-  stage.hidden = false;
+function markInteracted() {
+  if (interacted) return;
+  interacted = true;
   unmuteMusic();
-  render();
-}, { once: true });
+}
+document.addEventListener('click', markInteracted, { once: true });
+document.addEventListener('touchend', markInteracted, { once: true });
+document.addEventListener('keydown', markInteracted, { once: true });
 
+render();
 loadYouTube();
