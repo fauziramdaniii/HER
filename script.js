@@ -17,6 +17,7 @@ const CONFIG = {
   ],
 
   closing: 'even though you won\'t be in my life anymore, i\'m glad our paths crossed, even if only for a little while.', // tampil setelah bubble terakhir
+  signOff: 'with love,\nFauzi Ramdani', // tanda tangan di bawah kalimat penutup
 
   youtubeId: 'XZfyyk0_Yqs', // ID video YouTube (bagian setelah v= di link); '' kalau tidak pakai lagu
   musicStart: 0,            // mulai dari detik ke berapa
@@ -77,7 +78,13 @@ function go(delta) {
 
 function finish() {
   stage.hidden = true;
-  signature.textContent = CONFIG.closing;
+  const closingEl = document.createElement('p');
+  closingEl.className = 'closing';
+  closingEl.textContent = CONFIG.closing;
+  const signOffEl = document.createElement('p');
+  signOffEl.className = 'sign-off';
+  signOffEl.textContent = CONFIG.signOff;
+  signature.replaceChildren(closingEl, signOffEl);
   signature.classList.add('show');
 }
 
